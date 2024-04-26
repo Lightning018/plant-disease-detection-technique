@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Upload and Prediction</title>
+</head>
+<body>
+    <h1>Image Upload and Prediction</h1>
+    <form id="uploadForm">
+        <input type="file" id="fileInput" accept=".jpg, .jpeg, .png">
+        <button type="submit">Upload Image</button>
+    </form>
+    <div id="result">RESULT:</div>
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select an image file.');
+                return;
+            }
+
+            // Create form data and append file
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Send POST request to endpoint
+            fetch('http://127.0.0.1:6699/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Display response
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `<p>Predicted class: ${data.result}</p>`;
+                console.log(data.result);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+                console.log(error.message);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html> 
+<html> 
+    <head> 
+        <META name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>File Upload Screen</title> 
+        <link rel="stylesheet" href="indexstyle.css">           
+    </head> 
+    <body> 
+        <div class="a">   
+            <video src="video8.mp4" autoplay loop muted>
+            </video>
+            <label for="input-file" id="drop-area" > 
+                <input type="file" accept="image/*" id="input-file" hidden> 
+                <div id="img-view"> 
+                    <img src="508-icon.png"> 
+                    <p>Drag and Drop or click here<br> to upload image</p> 
+                    <span> Upload any Images from Desktop</span> 
+                </div>
+                <div id="result">RESULT:</div> 
+            </label>
+            
+        </div> 
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select an image file.');
+                return;
+            }
+
+            // Create form data and append file
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Send POST request to endpoint
+            fetch('http://127.0.0.1:6699/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Display response
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `<p>Predicted class: ${data.result}</p>`;
+                console.log(data.result);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+                console.log(error.message);
+            });
+        });
+    </script>
+        <script src="script.js"></script> 
+     </body>
+</html>
